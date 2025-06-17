@@ -3,6 +3,7 @@ import json
 import requests
 import time
 import re
+import pandas as pd
 
 import os
 
@@ -83,6 +84,7 @@ def scraper_cache():
                 file_path = os.path.join('Pracuj_scrap', f"pracuj_offer.json")
                 with open(file_path, 'w', encoding='utf-8') as f:
                     json.dump(all_offers, f, ensure_ascii=False, indent=4)
+                
 
     if all_offers:
         print(f"Processing completed. Total offers found: {len(all_offers)}")

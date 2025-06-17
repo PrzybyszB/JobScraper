@@ -1,9 +1,17 @@
 version: '3.8'
 
 services:
-  redis:
-    image: redis:latest
-    container_name: redis_temp
+  job_scrap_db:
+    image: postgres:17
+    container_name: job_scrap_db
+    environment:
+      - POSTGRES_DB=job_scrap_db
+      - POSTGRES_USER=job_scrap_user
+      - POSTGRES_PASSWORD=job_scrap_password
     ports:
-      - 6379:6379
-    command: redis-server --bind 0.0.0.0
+      - 5432:5432
+    volumes:                           
+      - postgres-job_scrap-volume:/var/lib/postgresql/data
+
+volumes:                              
+  postgres-job_scrap-volume: {}
