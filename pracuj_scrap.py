@@ -47,11 +47,21 @@ def scraper_get():
         print(f"Download page {page}/{max_page}")
         time.sleep(1)
 
+
 def scraper_cache():
     #while tutaj powinien byc
     folder_path = "Pracuj_scrap"
     pages = os.listdir(folder_path)
     all_offers = []
+
+    # for filename in os.listdir(folder_path):
+    #     if filename.endswith('.html'):
+    #         file_path = os.path.join(folder_path, filename)
+    #         try:
+    #             os.remove(file_path)
+    #             print(f"Remove: {file_path}")
+    #         except Exception as e:
+    #             print(f"There was an error on remove file {file_path} : {e}")
 
     for page in pages:
         if page.endswith(".html"):
@@ -66,29 +76,28 @@ def scraper_cache():
                     offer_id = offer['offers'][0]['partitionId']
 
                     json_offer = {
-                        "offer_technologies": json.dumps(offer['technologies']),
+                        "offer_technologies": offer['technologies'],
                         "offer_job_title": offer['jobTitle'],
                         "offer_company_name": offer['companyName'],
                         "offer_exp_date": offer['expirationDate'],
                         "offer_description": offer['jobDescription'],
                         "offer_link": offer['offers'][0]['offerAbsoluteUri'],
                         "offer_city": offer['offers'][0]['displayWorkplace'],
-                        "offer_position_level": json.dumps(offer['positionLevels']),
-                        "offer_contract": json.dumps(offer['typesOfContract']),
-                        "offer_model_work": json.dumps(offer['workModes']),
+                        "offer_position_level": offer['positionLevels'],
+                        "offer_contract": offer['typesOfContract'],
+                        "offer_model_work": offer['workModes'],
                     }
 
                     all_offers.append(json_offer)
                     # redis_client.hset(f'pracuj_{offer_id}', mapping=json_offer)
 
-                file_path = os.path.join('Pracuj_scrap', f"pracuj_offer.json")
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    json.dump(all_offers, f, ensure_ascii=False, indent=4)
-                
-
     if all_offers:
+        file_path = os.path.join('Pracuj_scrap', f"pracuj_offer.json")
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(all_offers, f, ensure_ascii=False, indent=4)
         print(f"Processing completed. Total offers found: {len(all_offers)}")
-    
+    else:
+        print("There was no offer found")
 
-# scraper_get()
+scraper_get()
 scraper_cache()
