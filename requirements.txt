@@ -1,1 +1,11 @@
-python-dotenv
+beautifulsoup4==4.13.4
+pandas==2.0.3
+requests==2.32.4
+seleniumbase==4.39.5
+SQLAlchemy==2.0.18
+numpy
+openpyxl
+pyarrow
+pyjanitor
+ipykernel
+psycopg2

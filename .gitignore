@@ -9,3 +9,13 @@ Just_joint_scrap/
 downloaded_files/
 venv/
 .env
+airflow/logs/
+
+*.log
+*.csv
+*.sqlite3
+
+*.pyc
+__pycache__/
+*.pyo
+*.pyd

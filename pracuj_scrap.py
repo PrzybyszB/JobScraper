@@ -10,7 +10,7 @@ import os
 # redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
 
 def login():
-    output = subprocess.check_output(['sh', './pracuj_login.sh'], text=True)
+    output = subprocess.check_output(['sh', './scripts/pracuj_login.sh'], text=True)
     return json.loads(output.strip())
 
 # token = login()
@@ -33,7 +33,7 @@ def scraper_get():
     max_page = get_max_page()
 
     for page in range(1, max_page + 1):
-        url = "https://it.pracuj.pl/praca?et=1%2C17%2C4&itth=37&pn={page}"
+        url = f"https://it.pracuj.pl/praca?et=1%2C17%2C4&itth=37&pn={page}"
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3'}
         
         response = requests.get(url, headers=headers)
@@ -90,11 +90,14 @@ def scraper_cache():
 
                     all_offers.append(json_offer)
                     # redis_client.hset(f'pracuj_{offer_id}', mapping=json_offer)
-
+                    file_path = os.path.join('Pracuj_scrap', f"pracuj_offer.json")
+                    with open(file_path, 'w', encoding='utf-8') as f:
+                        json.dump(all_offers, f, ensure_ascii=False, indent=4)
+                    
     if all_offers:
-        file_path = os.path.join('Pracuj_scrap', f"pracuj_offer.json")
-        with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(all_offers, f, ensure_ascii=False, indent=4)
+        # file_path = os.path.join('Pracuj_scrap', f"pracuj_offer.json")
+        # with open(file_path, 'w', encoding='utf-8') as f:
+        #     json.dump(all_offers, f, ensure_ascii=False, indent=4)
         print(f"Processing completed. Total offers found: {len(all_offers)}")
     else:
         print("There was no offer found")
