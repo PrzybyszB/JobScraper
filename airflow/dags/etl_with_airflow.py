@@ -1,19 +1,28 @@
 import json
+import logging
 import pandas as pd
 from datetime import datetime
 from sqlalchemy import create_engine
 from datetime import timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator 
+from airflow.models import Variable
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 def extract(file):
+    logger.info(f"Extracting data from {file}")
     with open(file, 'r', encoding='utf-8') as f:
         offers = json.load(f)
+    logger.info(f"Extracted {len(offers)} offers")
     return offers
 
 def transform(**context):
     offers = context['ti'].xcom_pull(task_ids='extract')
     print("Offers type:", type(offers))
+    logger.info(f"Offers type: {type(offers)}")
     print("Offers value:", offers)
     cleaned_df = []
     for offer in offers:
@@ -30,10 +39,12 @@ def transform(**context):
             "url": offer['offer_link'],
         })
 
+    logger.info(f"Transformed {len(cleaned_df)} offers")
     return cleaned_df
 
 def load(**context):
     cleaned_df = context['ti'].xcom_pull(task_ids='transform')
+    logger.info(f"Loading {len(cleaned_df)} offers to database")
     df = pd.DataFrame(cleaned_df)
 
     user = 'job_scrap_user'
@@ -46,14 +57,17 @@ def load(**context):
 
     with engine.connect() as conn:
         conn.execute("DROP TABLE IF EXISTS offers;")
+        logger.info("Dropped table offers if existed")
         
     df.to_sql("offers", engine)
+    logger.info("Data was successfully saved to DB and as csv")
     print("Data was successffully saved to DB and as csv")
 
 default_args = {
     'owner': 'airflow',
     'retires': 5,
     'retry_delay': timedelta(minutes=5),
+    'sla': timedelta(minutes=20)
 }
 
 with DAG(

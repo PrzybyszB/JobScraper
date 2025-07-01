@@ -9,3 +9,5 @@ pyarrow
 pyjanitor
 ipykernel
 psycopg2
+python-dotenv
+boto3
